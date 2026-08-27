@@ -1,0 +1,27 @@
+- [x] Setup project build files and structures
+  - [x] settings.gradle
+  - [x] build.gradle
+  - [x] gradle.properties
+  - [x] local.properties
+  - [x] app/build.gradle
+- [x] Setup Android Manifest and resources
+  - [x] AndroidManifest.xml
+  - [x] strings.xml
+  - [x] themes.xml
+- [x] Implement Domain Layer
+  - [x] CropCycle.kt
+  - [x] CropRepository.kt
+- [x] Implement Data Layer
+  - [x] CropCycleEntity.kt
+  - [x] CropCycleDao.kt
+  - [x] KasekorDatabase.kt
+  - [x] CropRepositoryImpl.kt
+- [x] Implement UI Theme and Common components
+  - [x] Theme (Color, Type, Theme)
+  - [x] Common components (KhmerTextField, PrimaryButton)
+- [x] Implement Features (Screens & ViewModels)
+  - [x] Home screen & ViewModel
+  - [x] Calculator screen & ViewModel
+  - [x] Result screen & ViewModel
+- [x] Setup Entrypoint & Navigation in MainActivity
+- [x] Verify build compiles
