@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.saoly.kasekorcalculator.domain.model.CropCycle
 import com.saoly.kasekorcalculator.domain.repository.CropRepository
+import com.saoly.kasekorcalculator.ui.common.formatInput
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,6 +28,7 @@ class ResultViewModel @Inject constructor(
     private val _cropCycle = MutableStateFlow<CropCycle?>(null)
     val cropCycle: StateFlow<CropCycle?> = _cropCycle.asStateFlow()
 
+    // Price per the cycle's yield unit, as typed
     var testBuyerPrice by mutableStateOf("")
 
     init {
@@ -34,8 +36,7 @@ class ResultViewModel @Inject constructor(
             repository.getCropCycleById(cropCycleId).collect { cycle ->
                 _cropCycle.value = cycle
                 if (cycle != null && cycle.buyerPrice > 0.0 && testBuyerPrice.isEmpty()) {
-                    // Keep decimals (e.g. 1250.5) instead of truncating; drop a trailing ".0"
-                    testBuyerPrice = cycle.buyerPrice.toBigDecimal().stripTrailingZeros().toPlainString()
+                    testBuyerPrice = formatInput(cycle.yieldUnit.pricePerUnit(cycle.buyerPrice))
                 }
             }
         }
@@ -47,9 +48,10 @@ class ResultViewModel @Inject constructor(
     }
 
     fun saveBuyerPrice(onSaved: () -> Unit = {}) {
-        val price = testBuyerPrice.replace(",", "").toDoubleOrNull()?.takeIf { it >= 0.0 } ?: 0.0
+        val pricePerUnit = testBuyerPrice.replace(",", "").toDoubleOrNull()?.takeIf { it >= 0.0 } ?: 0.0
         val current = _cropCycle.value
         viewModelScope.launch {
+            val price = current?.yieldUnit?.pricePerKg(pricePerUnit) ?: 0.0
             if (current != null && current.buyerPrice != price) {
                 repository.insertCropCycle(current.copy(buyerPrice = price))
             }

@@ -27,11 +27,12 @@ flowchart LR
 - **Purpose:** Input seasonal expenses and expected harvest weight.
 - **Input Fields:**
   1. 🌾 **Crop Type:** Dropdown selector (Rice / ស្រូវ, Cassava / ដំឡូង, Mango / ស្វាយ).
-  2. 🌱 **Seeds Expense (ថ្លៃពូជ):** Numeric input in KHR or USD.
-  3. 💧 **Fertilizer & Pesticide Expense (ថ្លៃជី និងថ្នាំ):** Numeric input.
-  4. 🚜 **Fuel & Equipment Expense (ថ្លៃប្រេង និងឧបករណ៍):** Numeric input.
-  5. 👨‍🌾 **Labor Expense (ថ្លៃពលកម្ម):** Numeric input.
-  6. ⚖️ **Expected Yield (ទិន្នផលរំពឹងទុក):** Input weight in Kilograms (kg) or Tons.
+  2. 💵 **Currency (រូបិយប័ណ្ណ):** រៀល (KHR, default) or ដុល្លារ (USD). Expense labels and totals follow the choice.
+  3. 🌱 **Seeds Expense (ថ្លៃពូជ):** Numeric input in the chosen currency.
+  4. 💧 **Fertilizer & Pesticide Expense (ថ្លៃជី និងថ្នាំ):** Numeric input.
+  5. 🚜 **Fuel & Equipment Expense (ថ្លៃប្រេង និងឧបករណ៍):** Numeric input.
+  6. 👨‍🌾 **Labor Expense (ថ្លៃពលកម្ម):** Numeric input.
+  7. ⚖️ **Yield Unit & Expected Yield (ទិន្នផលរំពឹងទុក):** Choose គីឡូក្រាម (kg, default) or តោន (ton), then enter the weight.
 - **Real-Time Total:** Bottom bar live-updates total expenses as values are entered.
 
 ---
@@ -39,8 +40,8 @@ flowchart LR
 ### Screen 3: Result Screen (លទ្ធផល និងការចរចា)
 - **Purpose:** Display break-even price and simulate buyer offers.
 - **Key Display Elements:**
-  - 🛡️ **Break-Even Price Highlight:** Displays minimum sell price per kg (e.g., `1,200 ៛/kg`).
-  - 💵 **Negotiation Simulator:** Input middleman offer price to test profit/loss.
+  - 🛡️ **Break-Even Price Highlight:** Displays minimum sell price in the cycle's currency and unit (e.g., `1,200 រៀល / គីឡូក្រាម` or `$300.00 / តោន`).
+  - 💵 **Negotiation Simulator:** Input middleman offer price (same currency and unit) to test profit/loss. The price is saved when you press Enter or the save button.
   - 🎨 **Visual Indicator:**
     - 🟢 **Green Card & Text:** Offer > Break-Even (Profitable trade).
     - 🔴 **Red Card & Warning Alert:** Offer < Break-Even (Loss warning).
@@ -53,6 +54,6 @@ flowchart LR
 | :--- | :--- | :--- |
 | **Typography** | Google **Kantumruy Pro** (`>= 16.sp` body, `>= 22.sp` header) | Clear legibility for Khmer script across age groups |
 | **Touch Targets** | Minimum **`56.dp`** height for all buttons & inputs | Easy touch interaction for calloused hands in field environments |
-| **Keyboards** | Automatic `KeyboardType.Number` on field focus | Saves user from manually toggling complex keyboard layouts |
+| **Keyboards** | Automatic `KeyboardType.Decimal` on amount fields (allows cents for USD) | Saves user from manually toggling complex keyboard layouts |
 | **Color Contrast** | High contrast (#2E7D32 Green, #F9F9F9 Off-white background) | Ensures display remains visible under direct sun sunlight |
 | **Iconography** | Universal icons alongside every Khmer label | Assists users with varying literacy levels |

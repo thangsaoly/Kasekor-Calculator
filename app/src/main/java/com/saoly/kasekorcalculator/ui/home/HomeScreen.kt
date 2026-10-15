@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.saoly.kasekorcalculator.R
 import com.saoly.kasekorcalculator.domain.model.CropCycle
+import com.saoly.kasekorcalculator.ui.common.formatUnitPrice
+import com.saoly.kasekorcalculator.ui.common.labelRes
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -195,7 +197,11 @@ fun CropCycleCard(
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         )
                         Text(
-                            text = "${formatNumber(cycle.breakEvenPrice)} ${stringResource(id = R.string.khr_per_kg)}",
+                            text = stringResource(
+                                id = R.string.price_per_unit,
+                                formatUnitPrice(cycle.breakEvenPricePerUnit, cycle.currency),
+                                stringResource(id = cycle.yieldUnit.labelRes)
+                            ),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -234,6 +240,3 @@ private fun formatTimestamp(timestamp: Long): String {
     return sdf.format(Date(timestamp))
 }
 
-private fun formatNumber(number: Double): String {
-    return String.format(Locale.US, "%,.0f", number)
-}

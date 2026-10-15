@@ -23,11 +23,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.saoly.kasekorcalculator.R
-import com.saoly.kasekorcalculator.domain.model.CropCycle
+import com.saoly.kasekorcalculator.domain.model.Currency
 import com.saoly.kasekorcalculator.ui.common.KhmerTextField
 import com.saoly.kasekorcalculator.ui.common.PrimaryButton
+import com.saoly.kasekorcalculator.ui.common.formatMoney
+import com.saoly.kasekorcalculator.ui.common.formatQuantity
+import com.saoly.kasekorcalculator.ui.common.formatUnitPrice
+import com.saoly.kasekorcalculator.ui.common.labelRes
 import com.saoly.kasekorcalculator.ui.theme.*
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,9 +70,10 @@ fun ResultScreen(
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         cropCycle?.let { cycle ->
-            val buyerPrice = viewModel.testBuyerPrice.replace(",", "").toDoubleOrNull() ?: 0.0
-            // Amounts are displayed rounded to whole riel, so treat sub-riel results as break-even
-            val netProfit = cycle.calculateNetProfit(buyerPrice).let { if (kotlin.math.abs(it) < 0.5) 0.0 else it }
+            val buyerPricePerUnit = viewModel.testBuyerPrice.replace(",", "").toDoubleOrNull() ?: 0.0
+            val netProfit = cycle.netProfitForUnitPrice(buyerPricePerUnit)
+            val currencyLabel = stringResource(id = cycle.currency.labelRes)
+            val unitLabel = stringResource(id = cycle.yieldUnit.labelRes)
 
             Column(
                 modifier = Modifier
@@ -122,7 +126,7 @@ fun ResultScreen(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "${formatNumber(cycle.breakEvenPrice)} ${stringResource(id = R.string.khr_per_kg)}",
+                                text = stringResource(id = R.string.price_per_unit, formatUnitPrice(cycle.breakEvenPricePerUnit, cycle.currency), unitLabel),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
                                 color = GreenDark,
@@ -141,10 +145,10 @@ fun ResultScreen(
                             modifier = Modifier.padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            ExpenseRow(label = stringResource(id = R.string.label_seeds), value = cycle.seedsCost)
-                            ExpenseRow(label = stringResource(id = R.string.label_fertilizer), value = cycle.fertilizerCost)
-                            ExpenseRow(label = stringResource(id = R.string.label_labor), value = cycle.laborCost)
-                            ExpenseRow(label = stringResource(id = R.string.label_machinery), value = cycle.fuelCost)
+                            ExpenseRow(label = stringResource(id = R.string.label_seeds, currencyLabel), value = cycle.seedsCost, currency = cycle.currency)
+                            ExpenseRow(label = stringResource(id = R.string.label_fertilizer, currencyLabel), value = cycle.fertilizerCost, currency = cycle.currency)
+                            ExpenseRow(label = stringResource(id = R.string.label_labor, currencyLabel), value = cycle.laborCost, currency = cycle.currency)
+                            ExpenseRow(label = stringResource(id = R.string.label_machinery, currencyLabel), value = cycle.fuelCost, currency = cycle.currency)
                             
                             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                             
@@ -158,7 +162,7 @@ fun ResultScreen(
                                     fontSize = 17.sp
                                 )
                                 Text(
-                                    text = "${formatNumber(cycle.totalExpenses)} រៀល",
+                                    text = formatMoney(cycle.totalExpenses, cycle.currency),
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 17.sp,
                                     color = MaterialTheme.colorScheme.primary
@@ -169,12 +173,12 @@ fun ResultScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = stringResource(id = R.string.label_yield),
+                                    text = stringResource(id = R.string.label_yield, unitLabel),
                                     fontSize = 15.sp,
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                                 )
                                 Text(
-                                    text = "${formatNumber(cycle.expectedYield)} គីឡូក្រាម",
+                                    text = "${formatQuantity(cycle.expectedYieldInUnit)} $unitLabel",
                                     fontWeight = FontWeight.Medium,
                                     fontSize = 15.sp
                                 )
@@ -202,8 +206,8 @@ fun ResultScreen(
                             KhmerTextField(
                                 value = viewModel.testBuyerPrice,
                                 onValueChange = { viewModel.updateBuyerPrice(it) },
-                                label = stringResource(id = R.string.label_buyer_price),
-                                keyboardType = KeyboardType.Number,
+                                label = stringResource(id = R.string.label_buyer_price, currencyLabel, unitLabel),
+                                keyboardType = KeyboardType.Decimal,
                                 imeAction = ImeAction.Done,
                                 keyboardActions = KeyboardActions(
                                     onDone = {
@@ -271,7 +275,7 @@ fun ResultScreen(
                                                 color = statusTextColor.copy(alpha = 0.8f)
                                             )
                                             Text(
-                                                text = "${formatNumber(netProfit)} រៀល",
+                                                text = formatMoney(netProfit, cycle.currency),
                                                 fontSize = 20.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = statusTextColor
@@ -308,7 +312,7 @@ fun ResultScreen(
 }
 
 @Composable
-fun ExpenseRow(label: String, value: Double) {
+fun ExpenseRow(label: String, value: Double, currency: Currency) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -319,13 +323,10 @@ fun ExpenseRow(label: String, value: Double) {
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
         )
         Text(
-            text = "${formatNumber(value)} រៀល",
+            text = formatMoney(value, currency),
             fontSize = 15.sp,
             fontWeight = FontWeight.Medium
         )
     }
 }
 
-private fun formatNumber(number: Double): String {
-    return String.format(Locale.US, "%,.0f", number)
-}

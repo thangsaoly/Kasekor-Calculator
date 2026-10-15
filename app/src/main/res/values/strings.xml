@@ -10,13 +10,20 @@
     <string name="crop_mango">ស្វាយ 🥭</string>
     
     <string name="label_crop_name">ឈ្មោះវដ្តដំណាំ (ឧ. ស្រូវវស្សា ២០២៦)</string>
-    <string name="label_seeds">ថ្លៃគ្រាប់ពូជ (រៀល) 🌾</string>
-    <string name="label_fertilizer">ថ្លៃជី និងថ្នាំកសិកម្ម (រៀល) 💧</string>
-    <string name="label_machinery">ថ្លៃគ្រឿងចក្រ និងប្រេងឥន្ធនៈ (រៀល) 🚜</string>
-    <string name="label_labor">ថ្លៃពលកម្ម (រៀល) 👥</string>
-    <string name="label_yield">ទិន្នផលរំពឹងទុក (គីឡូក្រាម) ⚖️</string>
-    <string name="label_buyer_price">តម្លៃដេញថ្លៃរបស់ឈ្មួញកណ្តាល (រៀល/គីឡូក្រាម) 💵</string>
+    <string name="label_seeds">ថ្លៃគ្រាប់ពូជ (%1$s) 🌾</string>
+    <string name="label_fertilizer">ថ្លៃជី និងថ្នាំកសិកម្ម (%1$s) 💧</string>
+    <string name="label_machinery">ថ្លៃគ្រឿងចក្រ និងប្រេងឥន្ធនៈ (%1$s) 🚜</string>
+    <string name="label_labor">ថ្លៃពលកម្ម (%1$s) 👥</string>
+    <string name="label_yield">ទិន្នផលរំពឹងទុក (%1$s) ⚖️</string>
+    <string name="label_buyer_price">តម្លៃដេញថ្លៃរបស់ឈ្មួញកណ្តាល (%1$s/%2$s) 💵</string>
     
+    <string name="label_currency">រូបិយប័ណ្ណ 💵</string>
+    <string name="label_yield_unit">ឯកតាទិន្នផល ⚖️</string>
+    <string name="currency_khr">រៀល</string>
+    <string name="currency_usd">ដុល្លារ</string>
+    <string name="unit_kg">គីឡូក្រាម</string>
+    <string name="unit_ton">តោន</string>
+
     <string name="btn_calculate">គណនាតម្លៃដើម</string>
     <string name="btn_save">រក្សាទុកទិន្នន័យ</string>
     <string name="btn_delete">លុប</string>
@@ -26,7 +33,7 @@
     <string name="results_title">លទ្ធផលនៃការគណនា</string>
     <string name="total_expense">ថ្លៃដើមសរុប</string>
     <string name="break_even_price">តម្លៃលក់រួចខ្លួន</string>
-    <string name="khr_per_kg">រៀល / គីឡូក្រាម</string>
+    <string name="price_per_unit">%1$s / %2$s</string>
     <string name="profit_status">ស្ថានភាពចំណេញ/ខាត</string>
     <string name="net_profit">ប្រាក់ចំណេញដុល</string>
     

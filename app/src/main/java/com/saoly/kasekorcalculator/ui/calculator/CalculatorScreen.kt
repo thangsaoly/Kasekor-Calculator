@@ -23,8 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.saoly.kasekorcalculator.R
 import com.saoly.kasekorcalculator.ui.common.KhmerTextField
+import com.saoly.kasekorcalculator.domain.model.Currency
+import com.saoly.kasekorcalculator.domain.model.YieldUnit
 import com.saoly.kasekorcalculator.ui.common.PrimaryButton
-import java.util.Locale
+import com.saoly.kasekorcalculator.ui.common.formatMoney
+import com.saoly.kasekorcalculator.ui.common.labelRes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -164,12 +167,23 @@ fun CalculatorScreen(
                     }
                 }
 
+                // Currency
+                ChoiceRow(
+                    title = stringResource(id = R.string.label_currency),
+                    options = Currency.entries,
+                    selected = viewModel.currency,
+                    label = { stringResource(id = it.labelRes) },
+                    onSelect = { viewModel.currency = it }
+                )
+
+                val currencyLabel = stringResource(id = viewModel.currency.labelRes)
+
                 // Expenses: Seeds
                 KhmerTextField(
                     value = viewModel.seedsCost,
                     onValueChange = { viewModel.seedsCost = it },
-                    label = stringResource(id = R.string.label_seeds),
-                    keyboardType = KeyboardType.Number,
+                    label = stringResource(id = R.string.label_seeds, currencyLabel),
+                    keyboardType = KeyboardType.Decimal,
                     imeAction = ImeAction.Next
                 )
 
@@ -177,8 +191,8 @@ fun CalculatorScreen(
                 KhmerTextField(
                     value = viewModel.fertilizerCost,
                     onValueChange = { viewModel.fertilizerCost = it },
-                    label = stringResource(id = R.string.label_fertilizer),
-                    keyboardType = KeyboardType.Number,
+                    label = stringResource(id = R.string.label_fertilizer, currencyLabel),
+                    keyboardType = KeyboardType.Decimal,
                     imeAction = ImeAction.Next
                 )
 
@@ -186,8 +200,8 @@ fun CalculatorScreen(
                 KhmerTextField(
                     value = viewModel.laborCost,
                     onValueChange = { viewModel.laborCost = it },
-                    label = stringResource(id = R.string.label_labor),
-                    keyboardType = KeyboardType.Number,
+                    label = stringResource(id = R.string.label_labor, currencyLabel),
+                    keyboardType = KeyboardType.Decimal,
                     imeAction = ImeAction.Next
                 )
 
@@ -195,17 +209,24 @@ fun CalculatorScreen(
                 KhmerTextField(
                     value = viewModel.fuelCost,
                     onValueChange = { viewModel.fuelCost = it },
-                    label = stringResource(id = R.string.label_machinery),
-                    keyboardType = KeyboardType.Number,
+                    label = stringResource(id = R.string.label_machinery, currencyLabel),
+                    keyboardType = KeyboardType.Decimal,
                     imeAction = ImeAction.Next
                 )
 
                 // Yield
+                ChoiceRow(
+                    title = stringResource(id = R.string.label_yield_unit),
+                    options = YieldUnit.entries,
+                    selected = viewModel.yieldUnit,
+                    label = { stringResource(id = it.labelRes) },
+                    onSelect = { viewModel.yieldUnit = it }
+                )
                 KhmerTextField(
                     value = viewModel.expectedYield,
                     onValueChange = { viewModel.expectedYield = it },
-                    label = stringResource(id = R.string.label_yield),
-                    keyboardType = KeyboardType.Number,
+                    label = stringResource(id = R.string.label_yield, stringResource(id = viewModel.yieldUnit.labelRes)),
+                    keyboardType = KeyboardType.Decimal,
                     imeAction = ImeAction.Done
                 )
             }
@@ -234,7 +255,7 @@ fun CalculatorScreen(
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
                         Text(
-                            text = "${formatNumber(viewModel.totalExpensesLive)} រៀល",
+                            text = formatMoney(viewModel.totalExpensesLive, viewModel.currency),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,
@@ -252,6 +273,32 @@ fun CalculatorScreen(
     }
 }
 
-private fun formatNumber(number: Double): String {
-    return String.format(Locale.US, "%,.0f", number)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun <T> ChoiceRow(
+    title: String,
+    options: List<T>,
+    selected: T,
+    label: @Composable (T) -> String,
+    onSelect: (T) -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelLarge,
+            fontSize = 16.sp
+        )
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+            options.forEachIndexed { index, option ->
+                SegmentedButton(
+                    selected = option == selected,
+                    onClick = { onSelect(option) },
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
+                    modifier = Modifier.height(56.dp) // Large touch target for rural users
+                ) {
+                    Text(text = label(option), fontSize = 18.sp)
+                }
+            }
+        }
+    }
 }

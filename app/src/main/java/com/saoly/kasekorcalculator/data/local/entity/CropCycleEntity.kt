@@ -3,6 +3,8 @@ package com.saoly.kasekorcalculator.data.local.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.saoly.kasekorcalculator.domain.model.CropCycle
+import com.saoly.kasekorcalculator.domain.model.Currency
+import com.saoly.kasekorcalculator.domain.model.YieldUnit
 
 @Entity(tableName = "crop_cycles")
 data class CropCycleEntity(
@@ -16,6 +18,7 @@ data class CropCycleEntity(
     val expectedYield: Double,
     val buyerPrice: Double,
     val currency: String,
+    val yieldUnit: String,
     val createdAt: Long
 ) {
     fun toDomainModel(): CropCycle = CropCycle(
@@ -28,7 +31,8 @@ data class CropCycleEntity(
         fuelCost = fuelCost,
         expectedYield = expectedYield,
         buyerPrice = buyerPrice,
-        currency = currency,
+        currency = Currency.fromCode(currency),
+        yieldUnit = YieldUnit.fromCode(yieldUnit),
         createdAt = createdAt
     )
 
@@ -43,7 +47,8 @@ data class CropCycleEntity(
             fuelCost = cropCycle.fuelCost,
             expectedYield = cropCycle.expectedYield,
             buyerPrice = cropCycle.buyerPrice,
-            currency = cropCycle.currency,
+            currency = cropCycle.currency.name,
+            yieldUnit = cropCycle.yieldUnit.name,
             createdAt = cropCycle.createdAt
         )
     }

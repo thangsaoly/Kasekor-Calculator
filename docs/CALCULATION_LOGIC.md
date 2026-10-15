@@ -46,10 +46,23 @@ $$\text{Status} = \begin{cases} \text{PROFIT (Green)}, & \text{if } P_{\text{buy
 
 ---
 
-## 4. Edge Cases & Safeguards
+## 4. Currencies & Yield Units
+
+Each crop cycle is entered in one **currency** (KHR, the default, or USD) and one **yield unit** (kg, the default, or ton). Amounts are never converted between currencies.
+
+- Costs are stored in the cycle's currency.
+- Yield is always stored in **kg**: $Y_{\text{kg}} = Y_{\text{entered}} \times 1000$ when entered in tons.
+- The buyer price is stored **per kg** and shown per the cycle's unit: $P_{\text{ton}} = P_{\text{kg}} \times 1000$.
+- The formulas above therefore always run in kg; only display and input are converted.
+
+A net profit smaller than half of the smallest displayed amount (0.5 ៛, or $0.005) is shown as break-even.
+
+---
+
+## 5. Edge Cases & Safeguards
 
 | Scenario | Handled By | Outcome |
 | :--- | :--- | :--- |
 | **Yield = 0 kg** | Domain Model / ViewModel Validation | Prevents Division by Zero (`ArithmeticException`). Displays error: *"សូមបញ្ចូលទិន្នផល" (Please enter yield)* |
-| **Negative Expenses** | Input Filter / Regular Expressions | Restricts input to non-negative decimal numbers |
-| **Currency Formatting** | NumberFormatter Utility | Formats large numbers with localized commas (e.g., `1,500,000 ៛`) |
+| **Negative or Invalid Amounts** | `CalculatorViewModel` validation | Rejected with an error message; thousands separators (`1,500,000`) are accepted |
+| **Currency Formatting** | `ui/common/Formatters.kt` | KHR as whole riel (`1,500,000 រៀល`); USD with cents (`$1,234.50`), and 3 decimals for per-unit prices under $1 (`$0.275`) |

@@ -22,7 +22,9 @@ object DatabaseModule {
             context,
             KasekorDatabase::class.java,
             "kasekor_database"
-        ).build()
+        )
+            .addMigrations(KasekorDatabase.MIGRATION_1_2)
+            .build()
 
     @Provides
     @Singleton

@@ -6,6 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.saoly.kasekorcalculator.domain.model.CropCycle
+import com.saoly.kasekorcalculator.domain.model.Currency
+import com.saoly.kasekorcalculator.domain.model.YieldUnit
 import com.saoly.kasekorcalculator.domain.repository.CropRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,7 +27,9 @@ class CalculatorViewModel @Inject constructor(
     var fertilizerCost by mutableStateOf("")
     var laborCost by mutableStateOf("")
     var fuelCost by mutableStateOf("")
-    var expectedYield by mutableStateOf("")
+    var expectedYield by mutableStateOf("") // in yieldUnit
+    var currency by mutableStateOf(Currency.KHR)
+    var yieldUnit by mutableStateOf(YieldUnit.KG)
 
     private val _saveResult = MutableSharedFlow<SaveEvent>()
     val saveResult: SharedFlow<SaveEvent> = _saveResult
@@ -73,7 +77,9 @@ class CalculatorViewModel @Inject constructor(
                     fertilizerCost = fertilizer,
                     laborCost = labor,
                     fuelCost = fuel,
-                    expectedYield = yieldVal
+                    expectedYield = yieldUnit.toKg(yieldVal),
+                    currency = currency,
+                    yieldUnit = yieldUnit
                 )
                 val newId = repository.insertCropCycle(cropCycle)
                 _saveResult.emit(SaveEvent.Success(newId))
