@@ -19,6 +19,8 @@
     
     <string name="btn_calculate">គណនាតម្លៃដើម</string>
     <string name="btn_save">រក្សាទុកទិន្នន័យ</string>
+    <string name="btn_delete">លុប</string>
+    <string name="btn_cancel">បោះបង់</string>
     <string name="btn_back">ត្រឡប់ក្រោយ</string>
     
     <string name="results_title">លទ្ធផលនៃការគណនា</string>
@@ -35,6 +37,9 @@
     <string name="warn_loss">ប្រយ័ត្ន! ការលក់ក្នុងតម្លៃនេះនឹងធ្វើឱ្យលោកអ្នកខាតបង់ថវិកា។</string>
     <string name="msg_profit">តំលៃនេះផ្តល់ប្រាក់ចំណេញល្អសំរាប់ការនឿយហត់របស់លោកអ្នក។</string>
     
+    <string name="delete_title">លុបវដ្តដំណាំ?</string>
+    <string name="delete_message">តើលោកអ្នកពិតជាចង់លុប \"%1$s\" មែនទេ? ទិន្នន័យនេះមិនអាចយកមកវិញបានទេ។</string>
+
     <string name="field_required">សូមបំពេញព័ត៌មាននេះ</string>
     <string name="invalid_number">សូមបញ្ចូលលេខឱ្យបានត្រឹមត្រូវ</string>
 </resources>

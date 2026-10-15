@@ -4,20 +4,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.saoly.kasekorcalculator.domain.model.CropCycle
 import com.saoly.kasekorcalculator.domain.repository.CropRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CalculatorViewModel(
+@HiltViewModel
+class CalculatorViewModel @Inject constructor(
     private val repository: CropRepository
 ) : ViewModel() {
 
     var name by mutableStateOf("")
-    var cropType by mutableStateOf("ស្រូវ/Rice")
+    // Set by the screen to the first localized crop type label when blank
+    var cropType by mutableStateOf("")
     var seedsCost by mutableStateOf("")
     var fertilizerCost by mutableStateOf("")
     var laborCost by mutableStateOf("")
@@ -29,15 +32,20 @@ class CalculatorViewModel(
 
     val totalExpensesLive: Double
         get() {
-            val seeds = seedsCost.toDoubleOrNull() ?: 0.0
-            val fertilizer = fertilizerCost.toDoubleOrNull() ?: 0.0
-            val labor = laborCost.toDoubleOrNull() ?: 0.0
-            val fuel = fuelCost.toDoubleOrNull() ?: 0.0
-            return seeds + fertilizer + labor + fuel
+            return listOf(seedsCost, fertilizerCost, laborCost, fuelCost)
+                .sumOf { parseCost(it) ?: 0.0 }
         }
 
+    // Accepts thousands separators ("1,500,000"); returns null for invalid or negative input
+    private fun parseAmount(input: String): Double? =
+        input.replace(",", "").trim().toDoubleOrNull()?.takeIf { it >= 0.0 && it.isFinite() }
+
+    // Blank cost fields count as zero
+    private fun parseCost(input: String): Double? =
+        if (input.isBlank()) 0.0 else parseAmount(input)
+
     fun saveCropCycle() {
-        val yieldVal = expectedYield.toDoubleOrNull()
+        val yieldVal = parseAmount(expectedYield)
         if (name.isBlank() || yieldVal == null || yieldVal <= 0.0) {
             viewModelScope.launch {
                 _saveResult.emit(SaveEvent.ValidationError("សូមបំពេញឈ្មោះវដ្តដំណាំ និងទិន្នផលឱ្យបានត្រឹមត្រូវ"))
@@ -45,15 +53,21 @@ class CalculatorViewModel(
             return
         }
 
+        val seeds = parseCost(seedsCost)
+        val fertilizer = parseCost(fertilizerCost)
+        val labor = parseCost(laborCost)
+        val fuel = parseCost(fuelCost)
+        if (seeds == null || fertilizer == null || labor == null || fuel == null) {
+            viewModelScope.launch {
+                _saveResult.emit(SaveEvent.ValidationError("សូមបញ្ចូលលេខឱ្យបានត្រឹមត្រូវ"))
+            }
+            return
+        }
+
         viewModelScope.launch {
             try {
-                val seeds = seedsCost.toDoubleOrNull() ?: 0.0
-                val fertilizer = fertilizerCost.toDoubleOrNull() ?: 0.0
-                val labor = laborCost.toDoubleOrNull() ?: 0.0
-                val fuel = fuelCost.toDoubleOrNull() ?: 0.0
-
                 val cropCycle = CropCycle(
-                    name = name,
+                    name = name.trim(),
                     cropType = cropType,
                     seedsCost = seeds,
                     fertilizerCost = fertilizer,
@@ -61,17 +75,8 @@ class CalculatorViewModel(
                     fuelCost = fuel,
                     expectedYield = yieldVal
                 )
-                repository.insertCropCycle(cropCycle)
-                
-                // Fetch the newly inserted crop cycle (usually the latest since it's sorted by createdAt DESC)
-                repository.getAllCropCycles().collect { list ->
-                    val latest = list.firstOrNull { it.name == name && it.expectedYield == yieldVal }
-                    if (latest != null && latest.id != null) {
-                        _saveResult.emit(SaveEvent.Success(latest.id.toLong()))
-                    } else {
-                        _saveResult.emit(SaveEvent.Success(-1))
-                    }
-                }
+                val newId = repository.insertCropCycle(cropCycle)
+                _saveResult.emit(SaveEvent.Success(newId))
             } catch (e: Exception) {
                 _saveResult.emit(SaveEvent.Error(e.localizedMessage ?: "Error saving data"))
             }
@@ -82,15 +87,5 @@ class CalculatorViewModel(
         data class Success(val cropCycleId: Long) : SaveEvent
         data class ValidationError(val error: String) : SaveEvent
         data class Error(val message: String) : SaveEvent
-    }
-}
-
-class CalculatorViewModelFactory(private val repository: CropRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(CalculatorViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return CalculatorViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

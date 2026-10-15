@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -14,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -36,6 +38,7 @@ fun ResultScreen(
 ) {
     val cropCycle by viewModel.cropCycle.collectAsState()
     val scrollState = rememberScrollState()
+    val focusManager = LocalFocusManager.current
 
     Scaffold(
         topBar = {
@@ -64,8 +67,9 @@ fun ResultScreen(
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         cropCycle?.let { cycle ->
-            val buyerPrice = viewModel.testBuyerPrice.toDoubleOrNull() ?: 0.0
-            val netProfit = cycle.calculateNetProfit(buyerPrice)
+            val buyerPrice = viewModel.testBuyerPrice.replace(",", "").toDoubleOrNull() ?: 0.0
+            // Amounts are displayed rounded to whole riel, so treat sub-riel results as break-even
+            val netProfit = cycle.calculateNetProfit(buyerPrice).let { if (kotlin.math.abs(it) < 0.5) 0.0 else it }
 
             Column(
                 modifier = Modifier
@@ -200,7 +204,13 @@ fun ResultScreen(
                                 onValueChange = { viewModel.updateBuyerPrice(it) },
                                 label = stringResource(id = R.string.label_buyer_price),
                                 keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Done
+                                imeAction = ImeAction.Done,
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        focusManager.clearFocus()
+                                        viewModel.saveBuyerPrice()
+                                    }
+                                )
                             )
 
                             // Status Panel
@@ -289,7 +299,7 @@ fun ResultScreen(
                 ) {
                     PrimaryButton(
                         text = stringResource(id = R.string.btn_save),
-                        onClick = onReturnHome
+                        onClick = { viewModel.saveBuyerPrice(onSaved = onReturnHome) }
                     )
                 }
             }

@@ -10,6 +10,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,6 +34,34 @@ fun HomeScreen(
     onNavigateToResult: (Int) -> Unit
 ) {
     val cropCycles by viewModel.cropCycles.collectAsState()
+    var cycleToDelete by remember { mutableStateOf<CropCycle?>(null) }
+
+    cycleToDelete?.let { cycle ->
+        AlertDialog(
+            onDismissRequest = { cycleToDelete = null },
+            title = { Text(text = stringResource(id = R.string.delete_title)) },
+            text = { Text(text = stringResource(id = R.string.delete_message, cycle.name)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.deleteCropCycle(cycle)
+                        cycleToDelete = null
+                    }
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.btn_delete),
+                        color = MaterialTheme.colorScheme.error,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { cycleToDelete = null }) {
+                    Text(text = stringResource(id = R.string.btn_cancel))
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -96,11 +127,11 @@ fun HomeScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    items(cropCycles) { cycle ->
+                    items(cropCycles, key = { it.id ?: 0 }) { cycle ->
                         CropCycleCard(
                             cycle = cycle,
                             onCardClick = { cycle.id?.let { onNavigateToResult(it) } },
-                            onDeleteClick = { viewModel.deleteCropCycle(cycle) }
+                            onDeleteClick = { cycleToDelete = cycle }
                         )
                     }
                 }
@@ -180,7 +211,7 @@ fun CropCycleCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete",
+                    contentDescription = stringResource(id = R.string.btn_delete),
                     tint = MaterialTheme.colorScheme.error
                 )
             }
@@ -189,10 +220,11 @@ fun CropCycleCard(
 }
 
 private fun getCropEmoji(cropType: String): String {
-    return when (cropType) {
-        "ស្រូវ/Rice" -> "🌾"
-        "ដំឡូងមី/Cassava" -> "🥔"
-        "ស្វាយ/Mango" -> "🥭"
+    // Match on the Khmer name so both stored label formats ("ស្រូវ 🌾" and legacy "ស្រូវ/Rice") resolve
+    return when {
+        cropType.startsWith("ស្រូវ") -> "🌾"
+        cropType.startsWith("ដំឡូងមី") -> "🥔"
+        cropType.startsWith("ស្វាយ") -> "🥭"
         else -> "🌱"
     }
 }

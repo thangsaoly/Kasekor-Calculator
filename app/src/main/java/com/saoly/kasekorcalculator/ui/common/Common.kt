@@ -2,6 +2,7 @@ package com.saoly.kasekorcalculator.ui.common
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -25,7 +26,8 @@ fun KhmerTextField(
     modifier: Modifier = Modifier,
     leadingIcon: @Composable (() -> Unit)? = null,
     keyboardType: KeyboardType = KeyboardType.Number,
-    imeAction: ImeAction = ImeAction.Next
+    imeAction: ImeAction = ImeAction.Next,
+    keyboardActions: KeyboardActions = KeyboardActions.Default
 ) {
     OutlinedTextField(
         value = value,
@@ -43,6 +45,7 @@ fun KhmerTextField(
             keyboardType = keyboardType,
             imeAction = imeAction
         ),
+        keyboardActions = keyboardActions,
         textStyle = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = MaterialTheme.colorScheme.primary,

@@ -42,6 +42,9 @@ fun CalculatorScreen(
         stringResource(id = R.string.crop_cassava),
         stringResource(id = R.string.crop_mango)
     )
+    if (viewModel.cropType.isBlank()) {
+        viewModel.cropType = cropTypes.first()
+    }
 
     LaunchedEffect(key1 = viewModel.saveResult) {
         viewModel.saveResult.collect { event ->

@@ -17,7 +17,7 @@ interface CropCycleDao {
     fun getCropCycleById(id: Int): Flow<CropCycleEntity?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCropCycle(cropCycle: CropCycleEntity)
+    suspend fun insertCropCycle(cropCycle: CropCycleEntity): Long
 
     @Delete
     suspend fun deleteCropCycle(cropCycle: CropCycleEntity)

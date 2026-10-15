@@ -6,8 +6,9 @@ import com.saoly.kasekorcalculator.domain.model.CropCycle
 import com.saoly.kasekorcalculator.domain.repository.CropRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class CropRepositoryImpl(
+class CropRepositoryImpl @Inject constructor(
     private val dao: CropCycleDao
 ) : CropRepository {
 
@@ -21,8 +22,8 @@ class CropRepositoryImpl(
         return dao.getCropCycleById(id).map { it?.toDomainModel() }
     }
 
-    override suspend fun insertCropCycle(cropCycle: CropCycle) {
-        dao.insertCropCycle(CropCycleEntity.fromDomainModel(cropCycle))
+    override suspend fun insertCropCycle(cropCycle: CropCycle): Long {
+        return dao.insertCropCycle(CropCycleEntity.fromDomainModel(cropCycle))
     }
 
     override suspend fun deleteCropCycle(cropCycle: CropCycle) {

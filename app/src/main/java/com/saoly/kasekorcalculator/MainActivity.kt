@@ -3,31 +3,25 @@ package com.saoly.kasekorcalculator
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.saoly.kasekorcalculator.data.local.KasekorDatabase
-import com.saoly.kasekorcalculator.data.repository.CropRepositoryImpl
 import com.saoly.kasekorcalculator.ui.calculator.CalculatorScreen
 import com.saoly.kasekorcalculator.ui.calculator.CalculatorViewModel
-import com.saoly.kasekorcalculator.ui.calculator.CalculatorViewModelFactory
 import com.saoly.kasekorcalculator.ui.home.HomeScreen
 import com.saoly.kasekorcalculator.ui.home.HomeViewModel
-import com.saoly.kasekorcalculator.ui.home.HomeViewModelFactory
 import com.saoly.kasekorcalculator.ui.result.ResultScreen
 import com.saoly.kasekorcalculator.ui.result.ResultViewModel
-import com.saoly.kasekorcalculator.ui.result.ResultViewModelFactory
 import com.saoly.kasekorcalculator.ui.theme.KasekorCalculatorTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        val database = KasekorDatabase.getDatabase(applicationContext)
-        val repository = CropRepositoryImpl(database.cropCycleDao)
 
         setContent {
             KasekorCalculatorTheme {
@@ -35,9 +29,7 @@ class MainActivity : ComponentActivity() {
                 
                 NavHost(navController = navController, startDestination = "home") {
                     composable("home") {
-                        val homeViewModel: HomeViewModel = viewModel(
-                            factory = HomeViewModelFactory(repository)
-                        )
+                        val homeViewModel: HomeViewModel = hiltViewModel()
                         HomeScreen(
                             viewModel = homeViewModel,
                             onNavigateToCalculator = { navController.navigate("calculator") },
@@ -45,9 +37,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable("calculator") {
-                        val calculatorViewModel: CalculatorViewModel = viewModel(
-                            factory = CalculatorViewModelFactory(repository)
-                        )
+                        val calculatorViewModel: CalculatorViewModel = hiltViewModel()
                         CalculatorScreen(
                             viewModel = calculatorViewModel,
                             onNavigateBack = { navController.popBackStack() },
@@ -61,11 +51,8 @@ class MainActivity : ComponentActivity() {
                     composable(
                         route = "result/{cropCycleId}",
                         arguments = listOf(navArgument("cropCycleId") { type = NavType.IntType })
-                    ) { backStackEntry ->
-                        val cropCycleId = backStackEntry.arguments?.getInt("cropCycleId") ?: -1
-                        val resultViewModel: ResultViewModel = viewModel(
-                            factory = ResultViewModelFactory(repository, cropCycleId)
-                        )
+                    ) {
+                        val resultViewModel: ResultViewModel = hiltViewModel()
                         ResultScreen(
                             viewModel = resultViewModel,
                             onNavigateBack = { navController.popBackStack() },
