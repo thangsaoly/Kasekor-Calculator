@@ -26,6 +26,10 @@ class CropRepositoryImpl @Inject constructor(
         return dao.insertCropCycle(CropCycleEntity.fromDomainModel(cropCycle))
     }
 
+    override suspend fun updateCropCycle(cropCycle: CropCycle) {
+        dao.updateCropCycle(CropCycleEntity.fromDomainModel(cropCycle))
+    }
+
     override suspend fun deleteCropCycle(cropCycle: CropCycle) {
         dao.deleteCropCycle(CropCycleEntity.fromDomainModel(cropCycle))
     }

@@ -36,7 +36,15 @@ class MainActivity : ComponentActivity() {
                             onNavigateToResult = { id -> navController.navigate("result/$id") }
                         )
                     }
-                    composable("calculator") {
+                    composable(
+                        route = "calculator?cropCycleId={cropCycleId}",
+                        arguments = listOf(
+                            navArgument("cropCycleId") {
+                                type = NavType.IntType
+                                defaultValue = -1 // -1 adds a new crop cycle
+                            }
+                        )
+                    ) {
                         val calculatorViewModel: CalculatorViewModel = hiltViewModel()
                         CalculatorScreen(
                             viewModel = calculatorViewModel,
@@ -51,7 +59,8 @@ class MainActivity : ComponentActivity() {
                     composable(
                         route = "result/{cropCycleId}",
                         arguments = listOf(navArgument("cropCycleId") { type = NavType.IntType })
-                    ) {
+                    ) { backStackEntry ->
+                        val cropCycleId = backStackEntry.arguments?.getInt("cropCycleId") ?: -1
                         val resultViewModel: ResultViewModel = hiltViewModel()
                         ResultScreen(
                             viewModel = resultViewModel,
@@ -60,7 +69,8 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate("home") {
                                     popUpTo("home") { inclusive = true }
                                 }
-                            }
+                            },
+                            onEdit = { navController.navigate("calculator?cropCycleId=$cropCycleId") }
                         )
                     }
                 }

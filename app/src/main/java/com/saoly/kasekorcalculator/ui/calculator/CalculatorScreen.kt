@@ -1,6 +1,7 @@
 package com.saoly.kasekorcalculator.ui.calculator
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -45,15 +46,57 @@ fun CalculatorScreen(
         stringResource(id = R.string.crop_cassava),
         stringResource(id = R.string.crop_mango)
     )
-    if (viewModel.cropType.isBlank()) {
-        viewModel.cropType = cropTypes.first()
+    val defaultCropType = cropTypes.first()
+    LaunchedEffect(defaultCropType) {
+        viewModel.setDefaultCropType(defaultCropType)
+    }
+
+    // Editing: confirm before throwing away unsaved changes
+    var showDiscardDialog by remember { mutableStateOf(false) }
+    val onBack: () -> Unit = {
+        if (viewModel.isEditing && viewModel.hasChanges) {
+            showDiscardDialog = true
+        } else {
+            onNavigateBack()
+        }
+    }
+    BackHandler(enabled = viewModel.isEditing && viewModel.hasChanges) { showDiscardDialog = true }
+
+    if (showDiscardDialog) {
+        AlertDialog(
+            onDismissRequest = { showDiscardDialog = false },
+            title = { Text(text = stringResource(id = R.string.discard_title)) },
+            text = { Text(text = stringResource(id = R.string.discard_message)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDiscardDialog = false
+                        onNavigateBack()
+                    }
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.btn_discard),
+                        color = MaterialTheme.colorScheme.error,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDiscardDialog = false }) {
+                    Text(text = stringResource(id = R.string.btn_keep_editing))
+                }
+            }
+        )
     }
 
     LaunchedEffect(key1 = viewModel.saveResult) {
         viewModel.saveResult.collect { event ->
             when (event) {
                 is CalculatorViewModel.SaveEvent.Success -> {
-                    if (event.cropCycleId != -1L) {
+                    if (viewModel.isEditing) {
+                        // Back to the result screen, which refreshes from the database
+                        onNavigateBack()
+                    } else if (event.cropCycleId != -1L) {
                         onNavigateToResult(event.cropCycleId.toInt())
                     } else {
                         onNavigateBack()
@@ -74,13 +117,15 @@ fun CalculatorScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = R.string.add_crop_cycle),
+                        text = stringResource(
+                            id = if (viewModel.isEditing) R.string.edit_crop_cycle else R.string.add_crop_cycle
+                        ),
                         style = MaterialTheme.typography.titleLarge,
                         color = Color.White
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(id = R.string.btn_back),
@@ -264,7 +309,9 @@ fun CalculatorScreen(
                     }
 
                     PrimaryButton(
-                        text = stringResource(id = R.string.btn_calculate),
+                        text = stringResource(
+                            id = if (viewModel.isEditing) R.string.btn_save_changes else R.string.btn_calculate
+                        ),
                         onClick = { viewModel.saveCropCycle() }
                     )
                 }

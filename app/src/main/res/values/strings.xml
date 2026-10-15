@@ -24,6 +24,14 @@
     <string name="unit_kg">គីឡូក្រាម</string>
     <string name="unit_ton">តោន</string>
 
+    <string name="edit_crop_cycle">កែប្រែវដ្តដំណាំ</string>
+    <string name="btn_edit">កែប្រែ</string>
+    <string name="btn_save_changes">រក្សាទុកការកែប្រែ</string>
+    <string name="discard_title">បោះបង់ការកែប្រែ?</string>
+    <string name="discard_message">ការកែប្រែដែលមិនទាន់រក្សាទុកនឹងត្រូវបាត់បង់។</string>
+    <string name="btn_discard">មិនរក្សាទុក</string>
+    <string name="btn_keep_editing">បន្តកែប្រែ</string>
+
     <string name="btn_calculate">គណនាតម្លៃដើម</string>
     <string name="btn_save">រក្សាទុកទិន្នន័យ</string>
     <string name="btn_delete">លុប</string>

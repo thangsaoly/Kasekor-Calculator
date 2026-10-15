@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.saoly.kasekorcalculator.data.local.entity.CropCycleEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -18,6 +19,9 @@ interface CropCycleDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCropCycle(cropCycle: CropCycleEntity): Long
+
+    @Update
+    suspend fun updateCropCycle(cropCycle: CropCycleEntity)
 
     @Delete
     suspend fun deleteCropCycle(cropCycle: CropCycleEntity)

@@ -34,9 +34,19 @@ class ResultViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             repository.getCropCycleById(cropCycleId).collect { cycle ->
+                val previous = _cropCycle.value
                 _cropCycle.value = cycle
-                if (cycle != null && cycle.buyerPrice > 0.0 && testBuyerPrice.isEmpty()) {
-                    testBuyerPrice = formatInput(cycle.yieldUnit.pricePerUnit(cycle.buyerPrice))
+                if (cycle == null) return@collect
+                // Prefill on first load, and again after an edit changes the currency or unit,
+                // since a price typed in the old currency or per the old unit no longer applies
+                val unitsChanged = previous != null &&
+                    (previous.currency != cycle.currency || previous.yieldUnit != cycle.yieldUnit)
+                if ((previous == null && testBuyerPrice.isEmpty()) || unitsChanged) {
+                    testBuyerPrice = if (cycle.buyerPrice > 0.0) {
+                        formatInput(cycle.yieldUnit.pricePerUnit(cycle.buyerPrice))
+                    } else {
+                        ""
+                    }
                 }
             }
         }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -37,7 +38,8 @@ import com.saoly.kasekorcalculator.ui.theme.*
 fun ResultScreen(
     viewModel: ResultViewModel,
     onNavigateBack: () -> Unit,
-    onReturnHome: () -> Unit
+    onReturnHome: () -> Unit,
+    onEdit: () -> Unit
 ) {
     val cropCycle by viewModel.cropCycle.collectAsState()
     val scrollState = rememberScrollState()
@@ -58,6 +60,19 @@ fun ResultScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(id = R.string.btn_back),
+                            tint = Color.White
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = onEdit,
+                        enabled = cropCycle != null,
+                        modifier = Modifier.size(48.dp) // Large target for touch
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = stringResource(id = R.string.btn_edit),
                             tint = Color.White
                         )
                     }

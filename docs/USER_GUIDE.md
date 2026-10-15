@@ -11,6 +11,8 @@ flowchart LR
     Home["1. Home Screen\n(History Feed & FAB)"] -->|Tap '+' Button| Calc["2. Calculator Form\n(Enter Expenses & Yield)"]
     Calc -->|Tap 'Calculate'| Result["3. Result Screen\n(Break-Even Shield)"]
     Result -->|Save Record| Home
+    Result -->|Tap ✏️ Edit| Edit["2b. Calculator Form\n(Prefilled, Edit Mode)"]
+    Edit -->|Save Changes| Result
 ```
 
 ### Screen 1: Home Screen (ទំព័រដើម)
@@ -34,6 +36,7 @@ flowchart LR
   6. 👨‍🌾 **Labor Expense (ថ្លៃពលកម្ម):** Numeric input.
   7. ⚖️ **Yield Unit & Expected Yield (ទិន្នផលរំពឹងទុក):** Choose គីឡូក្រាម (kg, default) or តោន (ton), then enter the weight.
 - **Real-Time Total:** Bottom bar live-updates total expenses as values are entered.
+- **Edit Mode (កែប្រែវដ្តដំណាំ):** Opened from the ✏️ button on the Result screen. Every field is prefilled; **រក្សាទុកការកែប្រែ** saves over the same record (its date and place in the history list are kept) and returns to the Result screen. Pressing Back with unsaved changes asks whether to discard them. Changing the currency clears the saved buyer offer; amounts are never converted.
 
 ---
 
